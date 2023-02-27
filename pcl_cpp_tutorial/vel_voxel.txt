@@ -1,0 +1,51 @@
+#include <ros/ros.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/point_types.h>
+#include <pcl/conversions.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/transforms.h>
+#include <pcl/PCLPointCloud2.h>
+
+using namespace std;
+
+pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloudmsg2cloud(sensor_msgs::PointCloud2 cloudmsg){
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_dst(new pcl::PointCloud<pcl::PointXYZRGB>());
+	pcl::fromROSMsg(cloudmsg, *cloud_dst);
+	return cloud_dst;
+}
+
+void VelodynePointsCallback(const sensor_msgs::PointCloud2::ConstPtr &velodyne_data){
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr src(new pcl::PointCloud<pcl::PointXYZRGB>);
+	*src=*cloudmsg2cloud(*velodyne_data);
+}
+
+int main(int argc, char **argv){
+	ros::init(argc, argv, "Velodyne_Voxelization");
+	ros::NodeHandle nh;
+	
+	ros::Subscriber velodyne_data=nh.subscribe("/velodyne_points", 100, &VelodynePointsCallback);
+	//ros::Publisher voxel_velodyne_data=nh.advertise<sensor_msgs::PointCloud2.h>("/voxel_velodyne_points", 100);
+	/*
+	pcl::PointCloud<pcl::PointXYZ> pc_voxelized;
+	pcl::PointCloud<pcl::PointXYZ>::Ptr ptr_filtered(new pcl::PointCloud<pcl::PointXYZ>);
+	
+	pcl::VoxelGrid<pcl::PointXYZ> voxel_filter;
+	
+	float voxelsize=0.2;
+	voxel_filter.setInputCloud(src);
+	voxel_filter.setLeafSize(voxelsize, voxelsize, voxelsize);
+	voxel_filter.filter(*ptr_filtered);
+	
+	pc_voxelized=*ptr_filtered;
+	
+	ros::Rate loop_rate(10);
+	ros::spin();
+	
+	while(ros::ok()){
+		
+	}
+	*/
+	return 0;
+}
+
